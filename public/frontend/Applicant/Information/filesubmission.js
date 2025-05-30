@@ -209,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Show success and redirect
             showAlert('Documents submitted successfully!', 'success');
             setTimeout(() => {
-                window.location.href = "../Timeline/timeline.html";
+                window.location.href = "../Login/login.html";
             }, 1500);
 
         } catch (error) {
