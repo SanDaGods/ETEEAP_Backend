@@ -1,74 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // File upload handling
-    const fileInput = document.getElementById("file-upload");
-    const dropArea = document.querySelector(".upload");
-    const fileList = document.getElementById("file-list");
-    let uploadedFiles = new Set(); // Track unique files
-
-    // Handle file selection and drops
-    function handleFiles(files) {
-        if (files.length === 0) return;
-
-        Array.from(files).forEach(file => {
-            // Validate file size
-            if (file.size > 25 * 1024 * 1024) {
-                showAlert(`File "${file.name}" exceeds the 25MB limit.`, 'error');
-                return;
-            }
-
-            // Check for duplicate files
-            if (uploadedFiles.has(file.name)) {
-                showAlert(`File "${file.name}" is already uploaded.`, 'warning');
-                return;
-            }
-
-            uploadedFiles.add(file.name);
-
-            // Create file item element
-            const fileItem = document.createElement("div");
-            fileItem.classList.add("file-item");
-
-            const fileName = document.createElement("p");
-            fileName.classList.add("file-name");
-            fileName.textContent = file.name;
-
-            // Create remove button
-            const removeButton = document.createElement("button");
-            removeButton.textContent = "×";
-            removeButton.classList.add("remove-btn");
-            removeButton.title = "Remove file";
-
-            // Remove file handler
-            removeButton.onclick = function() {
-                fileItem.remove();
-                uploadedFiles.delete(file.name);
-                updateFileCount();
-            };
-
-            // Add preview for images
-            if (file.type.startsWith("image/")) {
-                const filePreview = document.createElement("img");
-                filePreview.classList.add("file-preview");
-                filePreview.src = URL.createObjectURL(file);
-                fileItem.appendChild(filePreview);
-            }
-
-            fileItem.appendChild(fileName);
-            fileItem.appendChild(removeButton);
-            fileList.appendChild(fileItem);
-
-            updateFileCount();
-        });
-    }
-
-    // Update the file counter display
-    function updateFileCount() {
-        const counter = document.getElementById("file-count");
-        if (counter) {
-            counter.textContent = `${uploadedFiles.size} file(s) selected`;
-        }
-    }
-
     // Show alert message
     function showAlert(message, type = 'info') {
         const alertBox = document.createElement("div");
@@ -82,38 +12,6 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => alertBox.remove(), 500);
         }, 3000);
     }
-
-    // File input change event
-    fileInput.addEventListener("change", function() {
-        handleFiles(this.files);
-        this.value = ''; // Reset to allow selecting same file again
-    });
-
-    // Drag and drop events
-    ["dragenter", "dragover"].forEach(event => {
-        dropArea.addEventListener(event, (e) => {
-            e.preventDefault();
-            dropArea.classList.add("drag-active");
-        });
-    });
-
-    ["dragleave", "drop"].forEach(event => {
-        dropArea.addEventListener(event, (e) => {
-            e.preventDefault();
-            dropArea.classList.remove("drag-active");
-        });
-    });
-
-    dropArea.addEventListener("drop", (e) => {
-        handleFiles(e.dataTransfer.files);
-    });
-
-    // Prevent file manager from opening twice
-    dropArea.addEventListener("click", (e) => {
-        if (e.target === dropArea) {
-            fileInput.click();
-        }
-    });
 
     // Course selection dropdown logic
     function updateDropdowns() {
@@ -245,28 +143,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 thirdPriorityCourse: document.getElementById("third-prio").value
             };
 
-            // Prepare form data
-            const formData = new FormData();
-            formData.append("userId", userId);
-            formData.append("personalInfo", JSON.stringify(personalInfo));
-
-            // Add files if any
-            if (fileInput.files.length > 0) {
-                for (let i = 0; i < fileInput.files.length; i++) {
-                    formData.append("files", fileInput.files[i]);
-                }
-            }
-
             try {
                 // Update UI for submission
                 const submitButton = personalForm.querySelector('button[type="submit"]');
                 submitButton.disabled = true;
-                submitButton.innerHTML = '<span class="spinner"></span> Submitting...';
+                submitButton.innerHTML = '<span class="spinner"></span> Next Page';
 
                 // Send data to server
                 const response = await fetch("/api/update-personal-info", {
                     method: "POST",
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId: userId,
+                        personalInfo: personalInfo
+                    })
                 });
 
                 const data = await response.json();
@@ -278,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Show success and redirect
                 showAlert('Information submitted successfully!', 'success');
                 setTimeout(() => {
-                    window.location.href = "/frontend/Applicant/Login/login.html";
+                    window.location.href = "filesubmission.html";
                 }, 1500);
 
             } catch (error) {
@@ -288,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const submitButton = personalForm.querySelector('button[type="submit"]');
                 if (submitButton) {
                     submitButton.disabled = false;
-                    submitButton.textContent = "Submit";
+                    submitButton.textContent = "Next Page";
                 }
             }
         });
@@ -363,38 +255,6 @@ const dynamicStyles = `
     .alert.fade-out {
         transform: translateX(100%);
         opacity: 0;
-    }
-    .file-item {
-        display: flex;
-        align-items: center;
-        padding: 8px 12px;
-        margin: 5px 0;
-        background: #f5f5f5;
-        border-radius: 4px;
-    }
-    .file-preview {
-        width: 40px;
-        height: 40px;
-        object-fit: cover;
-        margin-right: 10px;
-        border-radius: 3px;
-    }
-    .remove-btn {
-        margin-left: auto;
-        background: #ff4444;
-        color: white;
-        border: none;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .drag-active {
-        border-color: #532989 !important;
-        background-color: #f0e6ff !important;
     }
     .spinner {
         display: inline-block;

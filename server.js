@@ -8,10 +8,9 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const multer = require('multer');
-const {GridFsStorage} = require('multer-gridfs-storage');
-const Grid = require('gridfs-stream');
-const MethodOverride = require('method-override');
 const fs = require("fs");
+const { GridFSBucket, ObjectId } = require('mongodb');
+const conn = mongoose.connection;
 
 const app = express();
 const PORT = 3000;
@@ -36,9 +35,17 @@ mongoose.connect("mongodb://127.0.0.1:27017/Eteeap", {
   useUnifiedTopology: true,
 });
 
-const conn = mongoose.connection;
-conn.on("error", console.error.bind(console, "MongoDB connection error:"));
-conn.once("open", () => console.log("✅ MongoDB connected successfully"));
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "MongoDB connection error:"));
+db.once("open", () => console.log("✅ MongoDB connected successfully"));
+
+// Initialize GridFS bucket
+let gfs;
+conn.once('open', () => {
+  gfs = new GridFSBucket(conn.db, {
+    bucketName: 'applicantFiles'
+  });
+});
 
 // ======================
 // SCHEMAS
@@ -181,14 +188,21 @@ const applicantSchema = new mongoose.Schema({
     thirdPriorityCourse: String,
   },
   files: [{
-    path: String,
+    fileId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
     name: String,
     type: String,
+    label: {
+        type: String,
+        default: 'initial-submission'
+    },
     uploadDate: {
-      type: Date,
-      default: Date.now
+        type: Date,
+        default: Date.now
     }
-  }],
+}],
   createdAt: { 
     type: Date, 
     default: Date.now 
@@ -425,26 +439,20 @@ async function getNextAssessorId() {
 // Set up multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Create directory path if it doesn't exist
-    const uploadDir = path.join(__dirname, 'public', 'uploads', 'Initial Submissions'); // Fixed typo here
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
+    cb(null, path.join(__dirname, 'public', 'uploads'));
   },
   filename: (req, file, cb) => {
-    // Use original filename but ensure it's sanitized
-    const sanitizedName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
-    cb(null, `${Date.now()}-${sanitizedName}`);
+    cb(null, Date.now() + path.extname(file.originalname));
   }
 });
 
-const upload = multer({ 
-  storage: storage,
-  limits: {
-    fileSize: 25 * 1024 * 1024 // 25MB limit
-  }
-});
+const upload = multer({ storage: storage });
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 // ======================
 // ROUTES
@@ -452,7 +460,7 @@ const upload = multer({
 
 // Default route
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "frontend", "Applicant", "Home", "index.html"));
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 // ======================
@@ -560,8 +568,6 @@ app.post("/api/register", async (req, res) => {
 });
 
 
-
-
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -617,90 +623,246 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-app.post("/api/update-personal-info", upload.array('files'), async (req, res) => {
+// Route to serve files
+app.get('/file/:id', async (req, res) => {
   try {
-    const { userId, personalInfo } = req.body;
-    
-    // Validate userId
-    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Invalid userId format' 
-      });
+    const fileId = new ObjectId(req.params.id);
+    const file = await conn.db.collection('applicantFiles.files').findOne({ _id: fileId });
+
+    if (!file) {
+      return res.status(404).json({ error: 'File not found' });
     }
 
-    // Parse personalInfo if it's a string
-    let parsedPersonalInfo;
-    try {
-      parsedPersonalInfo = typeof personalInfo === 'string' 
-        ? JSON.parse(personalInfo) 
-        : personalInfo;
-    } catch (parseError) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid personalInfo format',
-        details: parseError.message
-      });
-    }
+    res.set('Content-Type', file.contentType);
+    res.set('Content-Disposition', `inline; filename="${file.filename}"`);
 
-    // Prepare update data
-    const updateData = {
-      personalInfo: parsedPersonalInfo,
-      updatedAt: new Date()
-    };
-
-    // Handle file uploads if any
-    if (req.files && req.files.length > 0) {
-      updateData.$push = {
-        files: {
-          $each: req.files.map(file => ({
-            path: path.join('uploads', 'Initial Submissions', file.filename), // Use the stored filename
-            name: file.originalname,
-            type: path.extname(file.originalname).substring(1).toLowerCase(),
-            uploadDate: new Date()
-          }))
-        }
-      };
-    }
-
-    const updatedApplicant = await Applicant.findByIdAndUpdate(
-      userId,
-      updateData,
-      { new: true }
-    ).select('-password');
-
-    if (!updatedApplicant) {
-      // Clean up uploaded files if user not found
-      if (req.files) {
-        req.files.forEach(file => {
-          fs.unlinkSync(path.join(__dirname, 'public', file.path));
-        });
-      }
-      return res.status(404).json({ 
-        success: false, 
-        error: 'User not found' 
-      });
-    }
-
-    res.status(200).json({ 
-      success: true,
-      message: 'Personal information updated successfully',
-      data: updatedApplicant
-    });
+    const downloadStream = gfs.openDownloadStream(fileId);
+    downloadStream.pipe(res);
   } catch (error) {
-    console.error("Error updating personal info:", error);
-    // Clean up any uploaded files on error
-    if (req.files) {
-      req.files.forEach(file => {
-        fs.unlinkSync(path.join(__dirname, 'public', file.path));
-      });
-    }
-    res.status(500).json({ 
-      success: false,
-      error: 'Error updating personal info',
-      details: error.message
-    });
+    console.error('Error serving file:', error);
+    res.status(500).json({ error: 'Failed to serve file' });
   }
+});
+
+// Route to delete files
+app.delete('/file/:id', async (req, res) => {
+  try {
+    const fileId = new ObjectId(req.params.id);
+    await gfs.delete(fileId);
+    res.json({ success: true, message: 'File deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting file:', error);
+    res.status(500).json({ error: 'Failed to delete file' });
+  }
+});
+
+// Add this route before the server starts listening
+app.post('/api/submit-documents', upload.array('files'), async (req, res) => {
+    try {
+        // Check if files were uploaded
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ 
+                success: false,
+                error: 'No files uploaded' 
+            });
+        }
+
+        // Process each file
+        const uploadResults = await Promise.all(req.files.map(async (file) => {
+            return new Promise((resolve, reject) => {
+                const readStream = fs.createReadStream(file.path);
+                const uploadStream = gfs.openUploadStream(file.originalname, {
+                    contentType: file.mimetype,
+                    metadata: {
+                        uploadDate: new Date(),
+                        originalName: file.originalname,
+                        size: file.size,
+                        label: 'initial-submission'
+                    }
+                });
+
+                uploadStream.on('error', (error) => {
+                    fs.unlinkSync(file.path);
+                    reject(error);
+                });
+
+                uploadStream.on('finish', () => {
+                    fs.unlinkSync(file.path);
+                    resolve({
+                        fileId: uploadStream.id,
+                        filename: file.originalname,
+                        size: file.size,
+                        contentType: file.mimetype
+                    });
+                });
+
+                readStream.pipe(uploadStream);
+            });
+        }));
+
+        res.json({
+            success: true,
+            message: `${uploadResults.length} files uploaded successfully`,
+            files: uploadResults
+        });
+
+    } catch (error) {
+        console.error('File upload error:', error);
+        
+        // Clean up any remaining temp files
+        if (req.files) {
+            req.files.forEach(file => {
+                if (fs.existsSync(file.path)) {
+                    fs.unlinkSync(file.path);
+                }
+            });
+        }
+
+        res.status(500).json({ 
+            success: false,
+            error: 'File upload failed',
+            details: error.message
+        });
+    }
+});
+
+app.post("/api/update-personal-info", upload.array('files'), async (req, res) => {
+    try {
+        // Get the userId from the request body or form data
+        const userId = req.body.userId;
+        let personalInfo = req.body.personalInfo;
+        
+        // If personalInfo is a string, parse it
+        if (typeof personalInfo === 'string') {
+            try {
+                personalInfo = JSON.parse(personalInfo);
+            } catch (parseError) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Invalid personalInfo format',
+                    details: parseError.message
+                });
+            }
+        }
+
+        // Validate userId
+        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Invalid userId format' 
+            });
+        }
+
+        // Basic validation of required fields
+        const requiredFields = [
+            'firstname', 'lastname', 'gender', 'age', 'occupation', 
+            'nationality', 'civilstatus', 'birthDate', 'birthplace',
+            'mobileNumber', 'emailAddress', 'country', 'province',
+            'city', 'street', 'zipCode', 'firstPriorityCourse'
+        ];
+        
+        const missingFields = requiredFields.filter(field => !personalInfo[field]);
+        if (missingFields.length > 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Missing required fields',
+                missingFields
+            });
+        }
+
+        // Handle file uploads if any
+        const files = [];
+        if (req.files && req.files.length > 0) {
+            for (const file of req.files) {
+                const metadata = {
+                    type: file.mimetype,
+                    size: file.size,
+                    originalName: file.originalname,
+                    uploadDate: new Date(),
+                    label: 'initial-submission'
+                };
+
+                // Upload to GridFS
+                const uploadStream = gfs.openUploadStream(file.originalname, {
+                    contentType: file.mimetype,
+                    metadata: metadata
+                });
+
+                // Create read stream from the uploaded file
+                const readStream = fs.createReadStream(file.path);
+                
+                // Pipe the file data to GridFS
+                await new Promise((resolve, reject) => {
+                    readStream.pipe(uploadStream)
+                        .on('error', reject)
+                        .on('finish', resolve);
+                });
+
+                // Add file reference
+                files.push({
+                    fileId: uploadStream.id,
+                    name: file.originalname,
+                    type: file.mimetype,
+                    label: 'initial-submission',
+                    uploadDate: new Date()
+                });
+
+                // Delete the temporary file
+                fs.unlinkSync(file.path);
+            }
+        }
+
+        // Prepare update data
+        const updateData = {
+            personalInfo: personalInfo,
+            updatedAt: new Date()
+        };
+
+        // Add file references if any
+        if (files.length > 0) {
+            updateData.$push = {
+                files: {
+                    $each: files
+                }
+            };
+        }
+
+        const updatedApplicant = await Applicant.findByIdAndUpdate(
+            userId,
+            updateData,
+            { new: true }
+        ).select('-password');
+
+        if (!updatedApplicant) {
+            return res.status(404).json({ 
+                success: false, 
+                error: 'User not found' 
+            });
+        }
+
+        res.status(200).json({ 
+            success: true,
+            message: 'Personal information and documents updated successfully',
+            data: updatedApplicant
+        });
+    } catch (error) {
+        console.error("Error updating personal info:", error);
+        
+        // Clean up any uploaded files if error occurred
+        if (req.files) {
+            req.files.forEach(file => {
+                if (fs.existsSync(file.path)) {
+                    fs.unlinkSync(file.path);
+                }
+            });
+        }
+
+        res.status(500).json({ 
+            success: false,
+            error: 'Error updating personal info',
+            details: error.message
+        });
+    }
 });
 
 
@@ -2100,28 +2262,17 @@ app.get("/api/admin/evaluations/:id", adminAuthMiddleware, async (req, res) => {
 app.get('/documents/:filename', (req, res) => {
   const filename = req.params.filename;
   
-  // Security check - prevent directory traversal
-  if (filename.includes('..') || !/^[a-zA-Z0-9_\-\.]+$/.test(filename)) {
-      return res.status(400).json({ error: 'Invalid filename' });
+  if (!filename.endsWith('.pdf') || !/^[a-zA-Z0-9_\-\.]+\.pdf$/.test(filename)) {
+      return res.status(400).json({ error: 'Only PDF files are supported' });
   }
 
-  const filePath = path.join(__dirname, 'public', 'uploads', 'Initial Submissions', filename);
+  const filePath = path.join(__dirname, 'public', 'documents', filename);
   
   if (!fs.existsSync(filePath)) {
       return res.status(404).json({ error: 'File not found' });
   }
 
-  // Set appropriate content type
-  const ext = path.extname(filename).toLowerCase();
-  let contentType = 'application/octet-stream';
-  
-  if (ext === '.pdf') contentType = 'application/pdf';
-  else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
-  else if (ext === '.png') contentType = 'image/png';
-  else if (ext === '.doc') contentType = 'application/msword';
-  else if (ext === '.docx') contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-  
-  res.setHeader('Content-Type', contentType);
+  res.setHeader('Content-Type', 'application/pdf');
   res.sendFile(filePath);
 });
 
@@ -2148,6 +2299,17 @@ app.get("/api/evaluations/applicant/:applicantId", assessorAuthMiddleware, async
       error: 'Failed to fetch evaluations'
     });
   }
+});
+
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Unhandled error:', err);
+    res.status(500).json({
+        success: false,
+        error: 'Internal server error',
+        details: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
 });
 
 

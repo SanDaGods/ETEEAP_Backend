@@ -43,19 +43,19 @@
       <form id="personalForm">
           <div class="name">
               <div class="input">
-                  <input type="text" id="firstname" name="firstname" required>
+                  <input type="text" id="firstname" name="firstname" value="Juan" required>
                   <label for="firstname">First Name</label>
               </div>
               <div class="input">
-                  <input type="text" id="middlename" name="middlename">
+                  <input type="text" id="middlename" name="middlename" value="Dela">
                   <label for="middlename">Middle Name</label>
               </div>
               <div class="input">
-                  <input type="text" id="lastname" name="lastname" required>
+                  <input type="text" id="lastname" name="lastname" value="Cruz" required>
                   <label for="lastname">Last Name</label>
               </div>
               <div class="input suffix">
-                  <input type="text" id="suffix" name="suffix">
+                  <input type="text" id="suffix" name="suffix" value="Jr.">
                   <label for="suffix">Suffix</label>
               </div>
           </div>
@@ -63,28 +63,26 @@
           <div class="additional-info">
             <div class="input gender">
                 <select id="gender" name="gender" required>
-                    <option value="" disabled selected></option>
-                    <option value="male">Male</option>
+                    <option value="male" selected>Male</option>
                     <option value="female">Female</option>
                 </select>
                 <label for="gender">Gender</label>
             </div>
             <div class="input age">
-              <input type="number" id="age" name="age" required>
+              <input type="number" id="age" name="age" value="30" required>
               <label for="age">Age</label>
           </div>
             <div class="input">
-                <input type="text" id="occupation" name="occupation" required>
+                <input type="text" id="occupation" name="occupation" value="Software Developer" required>
                 <label for="occupation">Occupation</label>
             </div>
             <div class="input">
-                <input type="text" id="nationality" name="nationality" required>
+                <input type="text" id="nationality" name="nationality" value="Filipino" required>
                 <label for="nationality">Nationality</label>
             </div>
             <div class="input">
                 <select id="civilstatus" name="civilstatus" required>
-                    <option value="" disabled selected></option>
-                    <option value="single">Single</option>
+                    <option value="single" selected>Single</option>
                     <option value="married">Married</option>
                     <option value="widowed">Widowed</option>
                     <option value="divorced">Divorced</option>
@@ -98,11 +96,11 @@
           <h2>Birth Date / Place</h2>
           <div class="birth-info">
               <div class="input birth">
-                  <input type="date" id="birth-date" name="birth-date" required>
+                  <input type="date" id="birth-date" name="birth-date" value="1993-05-15" required>
                   <label for="birth-date">Birth Date</label>
               </div>
               <div class="input">
-                  <input type="text" id="birthplace" name="birthplace" required>
+                  <input type="text" id="birthplace" name="birthplace" value="Manila, Philippines" required>
                   <label for="birthplace">Birth Place</label>
               </div>
           </div>
@@ -113,15 +111,15 @@
           <h2>Contact Information</h2>
           <div class="contact-info">
               <div class="input">
-                  <input type="tel" id="mobile-number" name="mobile-number" required>
+                  <input type="tel" id="mobile-number" name="mobile-number" value="09171234567" required>
                   <label for="mobile-number">Mobile Number</label>
               </div>
               <div class="input">
-                  <input type="number" id="telephone-number" name="telephone-number">
+                  <input type="number" id="telephone-number" name="telephone-number" value="0287654321">
                   <label for="telephone-number">Telephone Number</label>
               </div>
               <div class="input">
-                  <input type="email" id="email-address" name="email-address" required>
+                  <input type="email" id="email-address" name="email-address" value="juan.delacruz@example.com" required>
                   <label for="email-address">Email Address</label>
               </div>
           </div>
@@ -131,26 +129,26 @@
           <h2>Home Address</h2>
           <div class="address">
             <div class="input">
-                <input type="text" id="country" name="country" required>
+                <input type="text" id="country" name="country" value="Philippines" required>
                 <label for="country">Country</label>
             </div>
             <div class="input">
-              <input type="text" id="province" name="province" required>
+              <input type="text" id="province" name="province" value="Metro Manila" required>
               <label for="province">Province/State</label>
             </div>
             <div class="input">
-              <input type="text" id="city" name="city" required>
+              <input type="text" id="city" name="city" value="Mandaluyong City" required>
               <label for="city">City</label>
             </div>
           </div>
 
           <div class="additional-address">
             <div class="input street">
-              <input type="text" id="street" name="street" required>
+              <input type="text" id="street" name="street" value="123 Pioneer Street" required>
               <label for="street">Street</label>
             </div>
             <div class="input zip-code">
-              <input type="number" id="zip-code" name="zip-code" required>
+              <input type="number" id="zip-code" name="zip-code" value="1550" required>
               <label for="zip-code">Zip-Code</label>
             </div>
           </div>
@@ -162,8 +160,7 @@
             <div class="input">
               <label for="First-prio">First Priority</label>
               <select id="First-prio" name="First-prio" required>
-                  <option value="" disabled selected></option>
-                  <option value="BS Information Technology">Bachelor of Science in Information Technology</option>
+                  <option value="BS Information Technology" selected>Bachelor of Science in Information Technology</option>
                   <option value="BS Entrepreneurship">Bachelor of Science in Entrepreneurship</option>
                   <option value="BS Office Administration">Bachelor of Science in Office Administration</option>
                   <option value="BSBA Operations Management">Bachelor of Science in Business Administration major in Operations Management</option>
@@ -179,14 +176,13 @@
             <div class="input">
               <label for="second-prio">Second Priority</label>
               <select id="second-prio" name="second-prio" required>
-                  <option value="" disabled selected></option>
+                  <option value="BSBA Human Resource Management" selected>Bachelor of Science in Business Administration major in Human Resource Management</option>
                   <option value="BS Information Technology">Bachelor of Science in Information Technology</option>
                   <option value="BS Entrepreneurship">Bachelor of Science in Entrepreneurship</option>
                   <option value="BS Office Administration">Bachelor of Science in Office Administration</option>
                   <option value="BSBA Operations Management">Bachelor of Science in Business Administration major in Operations Management</option>
                   <option value="BSBA Marketing Management">Bachelor of Science in Business Administration major in Marketing Management</option>
                   <option value="BSBA Financial Management">Bachelor of Science in Business Administration major in Financial Management</option>
-                  <option value="BSBA Human Resource Management">Bachelor of Science in Business Administration major in Human Resource Management</option>
                   <option value="BS Political Science">Bachelor of Science in Political Science</option>
                   <option value="BS Statistics">Bachelor of Science in Statistics</option>
                   <option value="BS Biology">Bachelor of Science in Biology</option>
@@ -196,11 +192,10 @@
             <div class="input">
               <label for="third-prio">Third Priority</label>
               <select id="third-prio" name="third-prio" required>
-                  <option value="" disabled selected></option>
+                  <option value="BSBA Operations Management" selected>Bachelor of Science in Business Administration major in Operations Management</option>
                   <option value="BS Information Technology">Bachelor of Science in Information Technology</option>
                   <option value="BS Entrepreneurship">Bachelor of Science in Entrepreneurship</option>
                   <option value="BS Office Administration">Bachelor of Science in Office Administration</option>
-                  <option value="BSBA Operations Management">Bachelor of Science in Business Administration major in Operations Management</option>
                   <option value="BSBA Marketing Management">Bachelor of Science in Business Administration major in Marketing Management</option>
                   <option value="BSBA Financial Management">Bachelor of Science in Business Administration major in Financial Management</option>
                   <option value="BSBA Human Resource Management">Bachelor of Science in Business Administration major in Human Resource Management</option>
@@ -212,54 +207,8 @@
             </div>
           </div>
 
-          <hr>
-
-          <div class="document">
-            <div>
-              <h4>Documents Required for Initial Screening:</h4>
-              <p>1. Diploma or Transcript of Records (TOR)</p>
-              <p>2. 1x1 ID Picture</p>
-              <p>3. Resume</p>
-              <p>4. Birth Certificate</p>
-              <p>5. Barangay Clearance or NBI Clearance or Passport</p>
-              <p>6. Certificate of Employment (Notarized)</p>
-              <p>7. Certificates of Training</p>
-              <p>8. Other supporting documents that qualify your application in the ETEEAP Program.</p>
-            </div>
-          
-            <div>
-              <h4>For unemployed applicants, submit one of the following:</h4>
-              <p>• Income Tax Return (ITR)</p>
-              <p>• SSS</p>
-              <p>• PhilHealth</p>
-              <p>• Pag-IBIG records</p>
-
-              <div class="note">
-                <br><br><strong>Note:</strong> Merge all documents using this <a href="https://smallpdf.com/merge-pdf" onclick="openImage()">link</a>. <br>
-                <p><strong>File name format:</strong> Lastname_Firstname_Middlename_Suffix (Initial_Screening)</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="submission">
-            <div class="upload" action="/uploads" method="post" enctype="multipart/form-data">
-              <h3 class="initial-submission">Initial Submission</h3>
-              <p>Drag and Drop files here</p>
-              <p>Max of 25mb file size</p>
-              <label for="file-upload" class="file-upload">Choose Files</label>
-              <input type="file" id="file-upload" name="files" multiple accept=".pdf"/>
-            </div>
-            
-            <div class="files">
-              <h3 class="uploaded-files">Uploaded Files</h3>
-              <div class="file-container">
-                  <div class="file-list" id="file-list"></div>
-              </div>
-            </div>
-          </div>
-          
           <div class="submit">
-            <button type="submit">Submit</button>
+            <button type="submit">Next Page</button>
           </div>
       </form>
   </div>
