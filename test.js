@@ -1,2 +1,2 @@
 console.log("WAYAYAYAYAYAYAYHOHOHOHOOHIHHIHIHIHI");
-console.log("Bilat HAHAHAHHAHAHA");
+console.log("Bilat HAHAHAHHAHAHAHA");
