@@ -5,6 +5,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const fileList = document.getElementById("file-list");
     const submitBtn = document.getElementById("submit-btn");
     let uploadedFiles = new Map(); // Track files with metadata
+
+                const userId = localStorage.getItem("userId");
+            if (!userId) {
+                showAlert('Session expired. Please login again.', 'error');
+                setTimeout(() => {
+                    window.location.href = '/frontend/Applicant/Login/login.html';
+                }, 2000);
+                return;
+            }
+
     
     // Maximum file size (25MB)
     const MAX_FILE_SIZE = 25 * 1024 * 1024;
@@ -51,7 +61,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 type: file.type,
                 size: file.size,
                 uploadDate: new Date(),
-                label: 'initial-submission'
+                label: 'initial-submission',
+                owner: userId
             });
 
             // Create file item element
@@ -192,6 +203,8 @@ document.addEventListener("DOMContentLoaded", () => {
             // Add all files to FormData
             Array.from(uploadedFiles.values()).forEach(fileData => {
                 formData.append('files', fileData.file);
+                formData.append('userId', userId);
+
             });
 
             // Send the request (replace with your actual endpoint)
@@ -209,7 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Show success and redirect
             showAlert('Documents submitted successfully!', 'success');
             setTimeout(() => {
-                window.location.href = "../Login/login.html";
+                window.location.href = "../Timeline/timeline.html";
             }, 1500);
 
         } catch (error) {

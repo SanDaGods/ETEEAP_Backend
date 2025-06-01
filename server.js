@@ -659,7 +659,16 @@ app.delete('/file/:id', async (req, res) => {
 // Add this route before the server starts listening
 app.post('/api/submit-documents', upload.array('files'), async (req, res) => {
     try {
-        // Check if files were uploaded
+
+        const userId = req.body.userId;
+
+                if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Invalid userId format' 
+            });
+        }
+
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({ 
                 success: false,
@@ -677,7 +686,8 @@ app.post('/api/submit-documents', upload.array('files'), async (req, res) => {
                         uploadDate: new Date(),
                         originalName: file.originalname,
                         size: file.size,
-                        label: 'initial-submission'
+                        label: 'initial-submission',
+                        owner: userId
                     }
                 });
 
