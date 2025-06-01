@@ -37,7 +37,30 @@ mongoose.connect("mongodb://127.0.0.1:27017/Eteeap", {
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
-db.once("open", () => console.log("✅ MongoDB connected successfully"));
+db.once("open", async () => {
+  console.log("✅ MongoDB connected successfully");
+  
+  try {
+    // Check if any admin exists
+    const Admin = mongoose.model('Admin', adminSchema);
+    const adminCount = await Admin.countDocuments();
+    
+    if (adminCount === 0) {
+      // Create a default admin if none exists
+      const defaultAdmin = new Admin({
+        email: 'admin@example.com',
+        password: 'SecurePassword123', // In production, you should hash this!
+        fullName: 'System Administrator',
+        isSuperAdmin: true
+      });
+      
+      await defaultAdmin.save();
+      console.log('🔑 Default admin account created:', defaultAdmin.email);
+    }
+  } catch (err) {
+    console.error('Error creating default admin:', err);
+  }
+});
 
 // Initialize GridFS bucket
 let gfs;
