@@ -43,7 +43,7 @@ db.once("open", () => console.log("✅ MongoDB connected successfully"));
 let gfs;
 conn.once('open', () => {
   gfs = new GridFSBucket(conn.db, {
-    bucketName: 'applicantFiles'
+    bucketName: 'backupFiles'
   });
 });
 

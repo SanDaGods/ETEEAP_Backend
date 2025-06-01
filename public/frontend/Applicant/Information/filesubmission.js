@@ -81,6 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
             fileSize.classList.add("file-size");
             fileSize.textContent = formatFileSize(file.size);
 
+
             // Create remove button
             const removeButton = document.createElement("button");
             removeButton.textContent = "×";
@@ -199,11 +200,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Create FormData object
             const formData = new FormData();
+
+            formData.append('userId', userId);
+
             
             // Add all files to FormData
             Array.from(uploadedFiles.values()).forEach(fileData => {
                 formData.append('files', fileData.file);
-                formData.append('userId', userId);
 
             });
 
