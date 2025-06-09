@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (!userId) {
       showAlert("Session expired. Please login again.", "error");
       setTimeout(() => {
-        window.location.href = "/frontend/Applicant/Login/login.html";
+        window.location.href = "/client/Applicant/Login/login.html";
       }, 2000);
       return;
     }
