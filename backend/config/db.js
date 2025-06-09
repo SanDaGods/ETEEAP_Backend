@@ -8,7 +8,7 @@ const fs = require("fs");
 const connectDB = async () => {
   try {
     await mongoose.connect(
-      "mongodb+srv://aaron:123123123@cluster0.z9iz8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+      "mongodb+srv://jedhishere:todajedh0611@cluster0.rg77uij.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
       {
         useNewUrlParser: true,
         useUnifiedTopology: true,
