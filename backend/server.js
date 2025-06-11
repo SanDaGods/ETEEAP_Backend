@@ -34,7 +34,7 @@ app.use(
 app.use(bodyParser.json());
 
 // Serve static files
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "frontend")));
 
 connectDB();
 
