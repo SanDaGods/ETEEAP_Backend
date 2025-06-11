@@ -26,7 +26,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["eteeap-domain-ltf3.vercel.app", "https://localhost:"],
+    origin: [
+      "https://eteeap-domain-uluo-n4vkxe0f6-sandagods-projects.vercel.app",
+      "https://localhost:",
+    ],
     credentials: true,
     exposedHeaders: ["set-cookie"],
   })
