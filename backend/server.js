@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost", // or your frontend URL
+    origin: "https://eteeap-domain-uluo.vercel.app",
     credentials: true,
     exposedHeaders: ["set-cookie"],
   })
