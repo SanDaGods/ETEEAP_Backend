@@ -43,6 +43,11 @@ app.use(express.static(path.join(__dirname, "frontend")));
 // ✅ Routes
 app.use("/", routes, applicants, assessors, admins);
 
+// ✅ ✅ ✅ ADD THIS TEST ROUTE HERE:
+app.get("/api/test", (req, res) => {
+  res.json({ message: "Backend working!" });
+});
+
 // ✅ Error handling middleware
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
