@@ -24,20 +24,35 @@ const assessors = require("./routes/assessorRoutes");
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
+app.use(bodyParser.json());
+
+// CORS Setup
+const allowedOrigins = [
+  "https://eteeap-domain-uluo.vercel.app",  // ✅ your production frontend
+  "http://localhost:3000"                   // ✅ for local development
+];
+
 app.use(
   cors({
-    origin: ["https://eteeap-domain.vercel.app", "https://localhost:"],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
     exposedHeaders: ["set-cookie"],
   })
 );
-app.use(bodyParser.json());
 
-// Serve static files
+// Serve static files (optional depending on your setup)
 app.use(express.static(path.join(__dirname, "frontend")));
 
+// Connect to MongoDB
 connectDB();
 
+// Routes
 app.use("/", routes, applicants, assessors, admins);
 
 // Error handling middleware
@@ -52,5 +67,5 @@ app.use((err, req, res, next) => {
 
 // Start Server
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Server running at port ${PORT}`);
 });
