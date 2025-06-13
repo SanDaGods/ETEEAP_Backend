@@ -10,10 +10,10 @@ const cors = require("cors");
 const multer = require("multer");
 const fs = require("fs");
 const { GridFSBucket, ObjectId } = require("mongodb");
-const conn = mongoose.connection;
 
 const app = express();
 
+// ✅ Import config and routes
 const connectDB = require("./config/db");
 const { PORT } = require("./config/constants");
 const routes = require("./routes");
@@ -21,41 +21,30 @@ const applicants = require("./routes/applicantRoutes");
 const admins = require("./routes/adminRoutes");
 const assessors = require("./routes/assessorRoutes");
 
-// Middleware
+// ✅ Connect to MongoDB
+connectDB();
+
+// ✅ Middleware
 app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-// CORS Setup
-const allowedOrigins = [
-  "https://eteeap-domain-uluo.vercel.app",  // ✅ your production frontend
-  "http://localhost:3000"                   // ✅ for local development
-];
-
+// ✅ Use CORS with environment variable for frontend
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: process.env.FRONTEND_URL,
     credentials: true,
     exposedHeaders: ["set-cookie"],
   })
 );
 
-// Serve static files (optional depending on your setup)
+// ✅ Optional: serve static files (if you have any frontend built into backend)
 app.use(express.static(path.join(__dirname, "frontend")));
 
-// Connect to MongoDB
-connectDB();
-
-// Routes
+// ✅ Routes
 app.use("/", routes, applicants, assessors, admins);
 
-// Error handling middleware
+// ✅ Error handling middleware
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
   res.status(500).json({
@@ -65,7 +54,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start Server
+// ✅ Start Server
 app.listen(PORT, () => {
   console.log(`Server running at port ${PORT}`);
 });
