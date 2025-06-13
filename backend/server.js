@@ -15,7 +15,6 @@ const app = express();
 
 // ✅ Import config and routes
 const connectDB = require("./config/db");
-const { PORT } = require("./config/constants");
 const routes = require("./routes");
 const applicants = require("./routes/applicantRoutes");
 const admins = require("./routes/adminRoutes");
@@ -38,7 +37,7 @@ app.use(
   })
 );
 
-// ✅ Optional: serve static files (if you have any frontend built into backend)
+// ✅ Optional: serve static files (only if needed)
 app.use(express.static(path.join(__dirname, "frontend")));
 
 // ✅ Routes
@@ -54,7 +53,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ✅ Start Server
+// ✅ Start Server with dynamic port (important for Railway)
+const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
   console.log(`Server running at port ${PORT}`);
 });
