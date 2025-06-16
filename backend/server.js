@@ -7,9 +7,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const multer = require("multer");
-const fs = require("fs");
-const { GridFSBucket, ObjectId } = require("mongodb");
 
 const app = express();
 
@@ -42,11 +39,13 @@ const routes = require("./routes");
 const applicants = require("./routes/applicantRoutes");
 const admins = require("./routes/adminRoutes");
 const assessors = require("./routes/assessorRoutes");
+const authRoutes = require("./routes/authRoutes"); // ✅ Add auth routes
 
 app.use("/", routes);
 app.use("/applicants", applicants);
 app.use("/admins", admins);
 app.use("/assessors", assessors);
+app.use("/api", authRoutes); // ✅ Enables /api/register route
 
 // ✅ Health check / test route
 app.get("/api/test", (req, res) => {
