@@ -1,3 +1,5 @@
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://eteeap-domain-uluo.vercel.app';
+
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
