@@ -157,3 +157,5 @@ const applicantSchema = new mongoose.Schema({
 }, { collection: "Applicants" });
 
 module.exports = mongoose.model("Applicant", applicantSchema);
+
+
