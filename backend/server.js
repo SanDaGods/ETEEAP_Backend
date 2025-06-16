@@ -1,5 +1,3 @@
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://eteeap-domain-uluo.vercel.app';
-
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
@@ -15,14 +13,11 @@ const { GridFSBucket, ObjectId } = require("mongodb");
 
 const app = express();
 
-// ✅ Import config and routes
-const connectDB = require("./config/db");
-const routes = require("./routes");
-const applicants = require("./routes/applicantRoutes");
-const admins = require("./routes/adminRoutes");
-const assessors = require("./routes/assessorRoutes");
+// ✅ Frontend URL fallback (used by CORS)
+const FRONTEND_URL = process.env.FRONTEND_URL || "https://eteeap-domain-uluo.vercel.app";
 
 // ✅ Connect to MongoDB
+const connectDB = require("./config/db");
 connectDB();
 
 // ✅ Middleware
@@ -30,27 +25,35 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-// ✅ Use CORS with environment variable for frontend
+// ✅ CORS setup (important for frontend interaction)
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: FRONTEND_URL,
     credentials: true,
     exposedHeaders: ["set-cookie"],
   })
 );
 
-// ✅ Optional: serve static files (only if needed)
+// ✅ Static file serving (optional, remove if not used)
 app.use(express.static(path.join(__dirname, "frontend")));
 
 // ✅ Routes
-app.use("/", routes, applicants, assessors, admins);
+const routes = require("./routes");
+const applicants = require("./routes/applicantRoutes");
+const admins = require("./routes/adminRoutes");
+const assessors = require("./routes/assessorRoutes");
 
-// ✅ ✅ ✅ ADD THIS TEST ROUTE HERE:
+app.use("/", routes);
+app.use("/applicants", applicants);
+app.use("/admins", admins);
+app.use("/assessors", assessors);
+
+// ✅ Health check / test route
 app.get("/api/test", (req, res) => {
   res.json({ message: "Backend working!" });
 });
 
-// ✅ Error handling middleware
+// ✅ Global error handler
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
   res.status(500).json({
@@ -60,9 +63,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ✅ Start Server with dynamic port (important for Railway)
+// ✅ Start server with dynamic port (important for Railway)
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running at port ${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
