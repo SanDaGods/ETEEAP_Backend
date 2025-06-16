@@ -1,31 +1,21 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const Applicant = require("../models/Applicant"); // make sure this path is correct
+const Applicant = require("../models/Applicant"); // adjust path
 
-router.post("/register", async (req, res) => {
+router.post("/api/register", async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ success: false, error: "Missing fields" });
-    }
-
-    const existing = await Applicant.findOne({ email });
-    if (existing) {
-      return res.status(400).json({ success: false, error: "Email already registered" });
-    }
+    if (!email || !password) return res.status(400).json({ error: "Missing fields" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const applicant = new Applicant({ email, password: hashedPassword });
+    const newApplicant = new Applicant({ email, password: hashedPassword });
+    await newApplicant.save();
 
-    await applicant.save();
-
-    res.status(201).json({ success: true, message: "Registration successful" });
+    res.json({ success: true, message: "Registered!" });
   } catch (err) {
-    console.error("Registration error:", err);
-    res.status(500).json({ success: false, error: "Internal server error", details: err.message });
+    console.error(err);
+    res.status(500).json({ success: false, error: "Server error", details: err.message });
   }
 });
 
