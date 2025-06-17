@@ -39,6 +39,11 @@ app.get("/api/test", (req, res) => {
   res.json({ message: " Backend working!" });
 });
 
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Backend root route working!" });
+});
+
+
 // Root path
 app.get("/", (req, res) => {
   res.send(" ETEEAP Backend is live");
