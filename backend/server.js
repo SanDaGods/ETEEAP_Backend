@@ -34,11 +34,6 @@ app.use("/admins", admins);
 app.use("/assessors", assessors);
 app.use("/api", authRoutes);
 
-// Health check
-app.get("/api/test", (req, res) => {
-  res.json({ message: " Backend working!" });
-});
-
 // Remove this duplicate ↓
 app.get("/", (req, res) => {
   res.send("ETEEAP Backend is live");
