@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 
 // Allow multiple frontend URLs
 const allowedOrigins = [
-  "https://eteeap-domain-uluo.vercel.app",
+  "https://eteeap-domain-new.vercel.app",
   "https://eteeap-domain-new.vercel.app"
 ];
 
