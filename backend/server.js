@@ -1,7 +1,6 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const path = require("path");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
@@ -11,7 +10,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS
+// CORS setup to allow requests from your frontend
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -19,9 +18,6 @@ app.use(
     exposedHeaders: ["set-cookie"],
   })
 );
-
-// Serve static files if needed
-app.use(express.static(path.join(__dirname, "frontend")));
 
 // Routes
 const routes = require("./routes");
@@ -36,20 +32,17 @@ app.use("/admins", admins);
 app.use("/assessors", assessors);
 app.use("/api", authRoutes);
 
-// ✅ Health check route
+// ✅ Health check
 app.get("/api/test", (req, res) => {
   res.json({ message: "Backend working!" });
 });
 
-// ✅ Root route (simple JSON to prevent HTML error)
+// ✅ Root JSON response
 app.get("/", (req, res) => {
   res.status(200).json({ message: "ETEEAP Backend is live" });
 });
 
-// ❌ Avoid duplicate or broken root routes
-// DO NOT use res.send("ETEEAP Backend is live") if you're expecting JSON
-
-// Global error handler (shows full message in dev)
+// Global error handler
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err.stack || err);
   res.status(500).json({
@@ -59,7 +52,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// MongoDB connection and server start
+// Connect to DB and start server
 const connectDB = require("./config/db");
 const PORT = process.env.PORT || 5000;
 
