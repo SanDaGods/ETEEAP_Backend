@@ -10,31 +10,21 @@ const cors = require("cors");
 
 const app = express();
 
-// Connect to MongoDB
-const connectDB = require("./config/db");
-connectDB();
-
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-// Allow multiple frontend URLs
-const allowedOrigins = [
-  "https://eteeap-domain-new.vercel.app",
-  "https://eteeap-domain-new.vercel.app"
-];
-
+// Allow all origins temporarily for debugging (CORS)
 app.use(
   cors({
-    origin: true, // Allow all origins temporarily
+    origin: true, // Will reflect the request origin
     credentials: true,
     exposedHeaders: ["set-cookie"],
   })
 );
 
-
-// Optional: Serve static frontend files if needed
+// Static files (optional)
 app.use(express.static(path.join(__dirname, "frontend")));
 
 // Routes
@@ -50,9 +40,14 @@ app.use("/admins", admins);
 app.use("/assessors", assessors);
 app.use("/api", authRoutes);
 
-// Health check endpoint
+// Health check
 app.get("/api/test", (req, res) => {
   res.json({ message: "Backend working!" });
+});
+
+// Catch root path (optional)
+app.get("/", (req, res) => {
+  res.send("ETEEAP Backend Root Route");
 });
 
 // Global error handler
@@ -65,8 +60,21 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
+// MongoDB Connection and Server Start
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+const connectDB = require("./config/db");
+
+(async () => {
+  try {
+    console.log("Connecting to MongoDB...");
+    await connectDB();
+    console.log("MongoDB connected");
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("Failed to start server:", err);
+  }
+})();
