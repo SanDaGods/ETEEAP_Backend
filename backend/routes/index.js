@@ -1,35 +1,19 @@
 const express = require("express");
-const path = require("path");
-const fs = require("fs");
-const applicantRoutes = require("./applicantRoutes");
-const assessorRoutes = require("./assessorRoutes");
-const adminRoutes = require("./adminRoutes");
-
 const router = express.Router();
 
-router.use(express.static(path.join(__dirname, "../../frontend")));
-router.use(express.static(path.join(__dirname, "../../frontend/client")));
-router.use(
-  express.static(path.join(__dirname, "../../frontend/client/applicant"))
-);
-router.use(
-  express.static(path.join(__dirname, "../../frontend/client/applicant/home"))
-);
-router.use(
-  express.static(path.join(__dirname, "../../frontend/client/applicant/login"))
-);
-
-router.get("/", (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "../../index.html")
-  );
+// Basic API root health check
+router.get("/ping", (req, res) => {
+  res.json({ success: true, message: "API root is working." });
 });
 
-router.get("/applicant-login", (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "../../frontend/client/applicant/login/login.html")
-  );
+// Optional test endpoint
+router.get("/test", (req, res) => {
+  res.json({ message: "Backend working!" });
 });
+
+// If you still want to support serving PDFs (optional)
+const path = require("path");
+const fs = require("fs");
 
 router.get("/documents/:filename", (req, res) => {
   const filename = req.params.filename;
@@ -41,7 +25,7 @@ router.get("/documents/:filename", (req, res) => {
     return res.status(400).json({ error: "Only PDF files are supported" });
   }
 
-  const filePath = path.join(__dirname, "public", "documents", filename);
+  const filePath = path.join(__dirname, "../public/documents", filename);
 
   if (!fs.existsSync(filePath)) {
     return res.status(404).json({ error: "File not found" });
