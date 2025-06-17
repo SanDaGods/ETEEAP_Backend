@@ -23,10 +23,10 @@ if (!allowedOrigin) {
 
 app.use(
   cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true,
-  exposedHeaders: ["set-cookie"],
-});
+    origin: allowedOrigin,
+    credentials: true,
+    exposedHeaders: ["set-cookie"],
+  })
 );
 
 // Optional: Static files (for production frontend serving)
