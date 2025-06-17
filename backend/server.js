@@ -35,7 +35,7 @@ app.use("/assessors", assessors);
 app.use("/api", authRoutes);
 
 // Remove this duplicate ↓
-app.get("/", (req, res) => {
+app.get("", (req, res) => {
   res.send("ETEEAP Backend is live");
 });
 
