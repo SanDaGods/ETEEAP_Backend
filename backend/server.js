@@ -15,10 +15,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-// Allow all origins temporarily for debugging (CORS)
+// ✅ CORS Configuration — explicitly allow Vercel domain
 app.use(
   cors({
-    origin: true, // Will reflect the request origin
+    origin: "https://eteeap-domain-new.vercel.app",
     credentials: true,
     exposedHeaders: ["set-cookie"],
   })
@@ -45,7 +45,7 @@ app.get("/api/test", (req, res) => {
   res.json({ message: "Backend working!" });
 });
 
-// Catch root path (optional)
+// Root route
 app.get("/", (req, res) => {
   res.send("ETEEAP Backend Root Route");
 });
@@ -62,7 +62,6 @@ app.use((err, req, res, next) => {
 
 // MongoDB Connection and Server Start
 const PORT = process.env.PORT || 5000;
-
 const connectDB = require("./config/db");
 
 (async () => {
@@ -78,4 +77,3 @@ const connectDB = require("./config/db");
     console.error("❌ Failed to start server:", err);
   }
 })();
-
