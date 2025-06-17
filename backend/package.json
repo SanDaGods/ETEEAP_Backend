@@ -6,7 +6,7 @@
   "author": "Capstone Intellects",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node backend/server.js",
     "dev": "nodemon server.js"
   },
   "dependencies": {
