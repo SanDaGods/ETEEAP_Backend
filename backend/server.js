@@ -61,7 +61,7 @@ app.use((err, req, res, next) => {
 });
 
 // MongoDB Connection and Server Start
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT; // No fallback to 5000
 const connectDB = require("./config/db");
 
 (async () => {
