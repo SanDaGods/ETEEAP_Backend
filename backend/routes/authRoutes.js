@@ -6,3 +6,7 @@ const authController = require("../controllers/authController");
 router.post("/register", authController.register);
 
 module.exports = router;
+
+router.get("/ping", (req, res) => {
+  res.json({ success: true, message: "Ping successful" });
+});
