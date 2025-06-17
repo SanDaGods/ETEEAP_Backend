@@ -21,7 +21,7 @@ router.use(
 
 router.get("/", (req, res) => {
   res.sendFile(
-    path.join(__dirname, "../../frontend/index.html")
+    path.join(__dirname, "../../index.html")
   );
 });
 
