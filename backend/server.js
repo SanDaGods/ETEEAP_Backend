@@ -71,10 +71,11 @@ const connectDB = require("./config/db");
     await connectDB();
     console.log("MongoDB connected");
 
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`✅ Server running on port ${PORT}`);
     });
   } catch (err) {
-    console.error("Failed to start server:", err);
+    console.error("❌ Failed to start server:", err);
   }
 })();
+
