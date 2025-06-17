@@ -27,18 +27,12 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like Postman)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS: " + origin));
-      }
-    },
+    origin: true, // Allow all origins temporarily
     credentials: true,
     exposedHeaders: ["set-cookie"],
   })
 );
+
 
 // Optional: Serve static frontend files if needed
 app.use(express.static(path.join(__dirname, "frontend")));
