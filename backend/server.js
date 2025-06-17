@@ -15,10 +15,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-// ✅ CORS Configuration — explicitly allow Vercel domain
+// CORS Setup (using .env FRONTEND_URL)
 app.use(
   cors({
-    origin: "https://eteeap-domain-new.vercel.app",
+    origin: process.env.FRONTEND_URL,
     credentials: true,
     exposedHeaders: ["set-cookie"],
   })
@@ -40,7 +40,7 @@ app.use("/admins", admins);
 app.use("/assessors", assessors);
 app.use("/api", authRoutes);
 
-// Health check
+// Health check route
 app.get("/api/test", (req, res) => {
   res.json({ message: "Backend working!" });
 });
@@ -61,7 +61,8 @@ app.use((err, req, res, next) => {
 });
 
 // MongoDB Connection and Server Start
-const PORT = process.env.PORT; // No fallback to 5000
+const PORT = process.env.PORT;
+
 const connectDB = require("./config/db");
 
 (async () => {
@@ -70,7 +71,7 @@ const connectDB = require("./config/db");
     await connectDB();
     console.log("MongoDB connected");
 
-    app.listen(PORT, '0.0.0.0', () => {
+    app.listen(PORT, "0.0.0.0", () => {
       console.log(`✅ Server running on port ${PORT}`);
     });
   } catch (err) {
