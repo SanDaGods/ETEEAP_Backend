@@ -39,11 +39,6 @@ app.get("/", (req, res) => {
   res.json({ message: " Backend working!" });
 });
 
-// Root path
-app.get("/", (req, res) => {
-  res.send(" ETEEAP Backend is live");
-});
-
 // Global error handler
 app.use((err, req, res, next) => {
   console.error(" Unhandled error:", err);
