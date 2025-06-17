@@ -35,14 +35,9 @@ app.use("/assessors", assessors);
 app.use("/api", authRoutes);
 
 // Health check
-app.get("/api/test", (req, res) => {
+app.get("/", (req, res) => {
   res.json({ message: " Backend working!" });
 });
-
-app.get("/", (req, res) => {
-  res.status(200).json({ message: "Backend root route working!" });
-});
-
 
 // Root path
 app.get("/", (req, res) => {
