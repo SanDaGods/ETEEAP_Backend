@@ -16,7 +16,7 @@ exports.register = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("❌ Register error:", err);
+    console.error("Register error:", err);
     return res.status(500).json({ success: false, error: "Internal error", message: err.message });
   }
 };
