@@ -5,8 +5,12 @@ const authController = require("../controllers/authController");
 // POST /api/register
 router.post("/register", authController.register);
 
-module.exports = router;
+// ✅ ADD THIS: POST /api/login
+router.post("/login", authController.login);
 
+// Optional: Ping test route
 router.get("/ping", (req, res) => {
   res.json({ success: true, message: "Ping successful" });
 });
+
+module.exports = router;
