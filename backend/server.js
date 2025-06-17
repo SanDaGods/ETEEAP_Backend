@@ -32,12 +32,12 @@ app.use("/admins", admins);
 app.use("/assessors", assessors);
 app.use("/api", authRoutes);
 
-// ✅ Health check
+// Health check
 app.get("/api/test", (req, res) => {
   res.json({ message: "Backend working!" });
 });
 
-// ✅ Root JSON response
+// Root JSON response
 app.get("/", (req, res) => {
   res.status(200).json({ message: "ETEEAP Backend is live" });
 });
