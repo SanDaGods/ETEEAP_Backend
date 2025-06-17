@@ -5,7 +5,7 @@ const authController = require("../controllers/authController");
 // POST /api/register
 router.post("/register", authController.register);
 
-// ✅ ADD THIS: POST /api/login
+// ADD THIS: POST /api/login
 router.post("/login", authController.login);
 
 // Optional: Ping test route
