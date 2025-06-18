@@ -39,8 +39,7 @@ exports.register = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: "Invalid email format",
-       details: `Please enter a valid email address. Provided: ${email}`,
-
+        details: `Please enter a valid email address (e.g., user@example.com). Provided: ${email}`,
       });
     }
     // Check password length
@@ -178,7 +177,7 @@ exports.fileFetch = async (req, res) => {
     }
 
     res.set("Content-Type", file.contentType);
-    res.set("Content-Disposition", inline; filename="${file.filename}");
+    res.set("Content-Disposition", `inline; filename="${file.filename}"`);
 
     const downloadStream = gfs.openDownloadStream(fileId);
     downloadStream.pipe(res);
@@ -254,7 +253,7 @@ exports.fileSubmit = async (req, res) => {
 
     res.json({
       success: true,
-      message: ${uploadResults.length} files uploaded successfully,
+      message: `${uploadResults.length} files uploaded successfully`,
       files: uploadResults,
     });
   } catch (error) {
