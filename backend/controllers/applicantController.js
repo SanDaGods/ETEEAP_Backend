@@ -39,7 +39,8 @@ exports.register = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: "Invalid email format",
-        details: Please enter a valid email address (e.g., user@example.com). Provided: ${email},
+       details: `Please enter a valid email address (e.g., user@example.com). Provided: ${email}`,
+
       });
     }
     // Check password length
